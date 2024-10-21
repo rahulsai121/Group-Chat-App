@@ -8,14 +8,22 @@ document.getElementById('signupForm').addEventListener('submit',
 
         console.log(name, email, password)
 
-        /*axios.post('http://localhost:3000/user/signup', {
+        axios.post('http://localhost:3000/user/signup', {
             name: name,
             email: email,
             password: password
         })
             .then(res => {
-                window.location.href = './login.html'
+                console.log(res.status)
+                //window.location.href = './login.html'
             })
-            .catch(err => console.log(err))*/
+            .catch(err => {
+
+                if (err.response.status == 409) {
+                    alert(err.response.data.message)
+
+                }
+                console.log(err)
+            })
     }
 )
