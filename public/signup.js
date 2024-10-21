@@ -14,7 +14,8 @@ document.getElementById('signupForm').addEventListener('submit',
             password: password
         })
             .then(res => {
-                console.log(res.status)
+                console.log(res)
+                alert(res.data.message)
                 //window.location.href = './login.html'
             })
             .catch(err => {
