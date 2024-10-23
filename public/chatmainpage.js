@@ -1,23 +1,32 @@
 document.addEventListener('DOMContentLoaded', (event) => {
 
-    const token = localStorage.getItem('token');
+    const fetchMessages = () => {
+        const token = localStorage.getItem('token');
 
-    axios.get('http://localhost:3000/user/message',
-        {
+        axios.get('http://localhost:3000/user/message', {
             headers: { authorization: token }
         })
-        .then(res=>{
-            const data=res.data.modifiedmessages
+        .then(res => {
+            const data = res.data.modifiedmessages;
 
-            for(let i=0;i<data.length;i++){
-
-                showOnScreen(data[i])
+            for (let i = 0; i < data.length; i++) {
+                showOnScreen(data[i]);
             }
         })
-        .catch(err=>console.log(err))
+        .catch(err => console.log(err));
+    };
+
+    setInterval(fetchMessages, 1000);
 })
 
 function showOnScreen(data){
+    
+    const existingpara=document.getElementById(`${data.id}para`)
+    
+    if(existingpara){
+        return ;
+    }
+
     const div=document.getElementById('messageDiv')
 
     const p=document.createElement('p')
@@ -29,6 +38,7 @@ function showOnScreen(data){
     p.style.backgroundColor='#FF6F61'
     }
     p.style.color='white'
+    p.id=`${data.id}para`
     div.appendChild(p)
 }
 
