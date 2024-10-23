@@ -16,7 +16,7 @@ document.getElementById('signupForm').addEventListener('submit',
             .then(res => {
                 console.log(res)
                 alert(res.data.message)
-                //window.location.href = './login.html'
+                window.location.href = './login.html'
             })
             .catch(err => {
 

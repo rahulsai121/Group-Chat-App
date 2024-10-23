@@ -6,17 +6,18 @@ document.getElementById('loginForm').addEventListener('submit',
     const password = document.getElementById('password').value
 
 
-    console.log(email,password)
     axios.post('http://localhost:3000/user/login', {
         email: email,
         password: password
     })
         .then(res => {
-            console.log(res)
+            const token=res.data.token
+            localStorage.setItem('token', token);
+            window.location.href='./chatmainpage.html'
         })
         .catch(error => {
-
             console.log(error);
+            alert(error.response.data.message)
         });
 
     }
