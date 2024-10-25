@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../model/user');
 const Message = require('../model/message')
-const { where } = require('sequelize');
-const message = require('../model/message');
+const { where, Op } = require('sequelize');
 
 require('dotenv').config();
 
@@ -88,24 +87,37 @@ exports.messagePost = async (req, res) => {
 
 
 exports.messageGet = async (req, res) => {
-    const messages = await Message.findAll({
-        include: [{
-            model: User,
-            attributes: ['id', 'name',]
+    try {
+        const lastMessageId = req.query.lastMessage
 
-        }]
-    })
-    const userId = req.userId
-    const modifiedmessages = messages.map(message => {
-        if (message.userId == userId) {
-            message.user.name = 'you';
-        }
+        const messages = await Message.findAll({
+            Where: {
+                id: {
+                    [Op.gt]: lastMessageId
+                }
+            },
+            include: [{
+                model: User,
+                attributes: ['id', 'name',]
 
-        return message;
+            }]
+        })
+        const userId = req.userId
+        const modifiedmessages = messages.map(message => {
+            if (message.userId == userId) {
+                message.user.name = 'you';
+            }
 
-    });
-    /*console.log('message----------',messages[2].user)
-    console.log('modified-------------',modifiedmessages[2].user)
-*/
-    res.status(200).json({ modifiedmessages })
+            return message;
+
+        });
+        /*console.log('message----------',messages[2].user)
+        console.log('modified-------------',modifiedmessages[2].user)
+    */
+        res.status(200).json({ modifiedmessages })
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).json({ error: "Failed to retrieve messages." });
+    }
 }

@@ -1,44 +1,49 @@
 document.addEventListener('DOMContentLoaded', (event) => {
+    const token = localStorage.getItem('token');
+    const lastMessage = JSON.parse(localStorage.getItem('message'));
 
-    const fetchMessages = () => {
-        const token = localStorage.getItem('token');
+    let lastMessageId = lastMessage[lastMessage.length - 1].id
 
-        axios.get('http://localhost:3000/user/message', {
-            headers: { authorization: token }
-        })
+
+    axios.get(`http://localhost:3000/user/message?lastMessageId=${lastMessageId}`, {
+        headers: { authorization: token }
+    })
+
+
         .then(res => {
-            const data = res.data.modifiedmessages;
+            let data = res.data.modifiedmessages;
+            let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
+            let allMessages = existingMessages.concat(data);
+            let recentMessages = allMessages.slice(-10);
 
-            for (let i = 0; i < data.length; i++) {
-                showOnScreen(data[i]);
-            }
+            localStorage.setItem('message', JSON.stringify(recentMessages));
+
+            recentMessages.forEach(message => showOnScreen(message));
         })
         .catch(err => console.log(err));
-    };
+});
 
-    setInterval(fetchMessages, 1000);
-})
 
-function showOnScreen(data){
-    
+function showOnScreen(data) {
+ 
     const existingpara=document.getElementById(`${data.id}para`)
     
     if(existingpara){
         return ;
     }
+    
+    const div = document.getElementById('messageDiv')
 
-    const div=document.getElementById('messageDiv')
-
-    const p=document.createElement('p')
-    p.textContent=`${data.user.name} --${data.message}`
-    if(data.user.name=='you'){
-    p.style.backgroundColor='#5B5EA6'
-    p.style.color='white'
-    }else{
-    p.style.backgroundColor='#FF6F61'
+    const p = document.createElement('p')
+    p.textContent = `${data.user.name} --${data.message}`
+    if (data.user.name == 'you') {
+        p.style.backgroundColor = '#5B5EA6'
+        p.style.color = 'white'
+    } else {
+        p.style.backgroundColor = '#FF6F61'
     }
-    p.style.color='white'
-    p.id=`${data.id}para`
+    p.style.color = 'white'
+    p.id = `${data.id}para`
     div.appendChild(p)
 }
 
@@ -59,8 +64,16 @@ document.getElementById('messageForm').addEventListener('submit',
                 headers: { authorization: token }
             })
             .then(res => {
-                console.log(res.data)
-                showOnScreen(res.data.newMessage)
+                let data = res.data.newMessage;
+                console.log('type',typeof(data),[data])
+                let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
+                let allMessages = existingMessages.concat(data);
+
+                let recentMessages = allMessages.slice(-10);
+
+                localStorage.setItem('message', JSON.stringify(recentMessages));
+ 
+                recentMessages.forEach(message => showOnScreen(message));
             })
             .catch(err => console.log(err))
 
@@ -68,7 +81,7 @@ document.getElementById('messageForm').addEventListener('submit',
     }
 )
 
-document.getElementById('logoutButton').addEventListener('click', function() {
+document.getElementById('logoutButton').addEventListener('click', function () {
     localStorage.clear();
     window.location.href = '/public/login.html';
 })
