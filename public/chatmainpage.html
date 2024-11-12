@@ -4,22 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Chat Page</title>
+    <title>Group Chat App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Chat App</h1> 
-    <div id="root">       
-        <form id="messageForm">
-            <input type="text" id="message">
-            <button type="submit">Submit</button>
-        </form>
+
+    <div id="header">
+        <h1>Chat App</h1>
         <button id="logoutButton">Logout</button>
     </div>
-    <div id="messageDiv">
 
+    <div id="mainDiv">
+
+        <div id="groupContainer">
+
+            <h2>Enter Message</h2>
+            <form id="messageForm">
+                <input type="text" id="message">
+                <button type="submit">Submit</button>
+            </form>
+
+            <h2>All The Groups Your in</h2>
+            <div id="allGroupDiv">
+                
+            </div>
+
+            <h2>Create Group</h2>
+            <form id="groupForm">
+                <label for="group">Group Name:</label>
+                <input type="text" id="createGroup" placeholder="Enter group name" required>
+                <button type="submit">Submit</button>
+            </form>
+
+            <h2>Add User to Group</h2>
+            <form id="addUserForm">
+                <input type="email" id="emailToAddUser" placeholder="Enter User Email" required>
+                <input type="text" id="groupNameToAddUser" placeholder="Group Name" required>
+                <button type="submit">Add User</button>
+            </form>
+
+            <h2>Promote User to Admin</h2>
+            <form id="promoteUserForm">
+                <input type="email" id="promoteUserTOAdmin" placeholder="Enter User Email" required>
+                <input type="text" id="GroupNameToPromoteUser" placeholder="Group Name" required>
+                <button type="submit">Promote User</button>
+            </form>
+
+            <h2>Remove User from Group</h2>
+            <form id="removeUserForm">
+                <input type="email" id="removeUser" placeholder="Enter User Email" required>
+                <input type="text" id="removeUserInGroup" placeholder="Group Name" required>
+                <button type="submit">Remove User</button>
+            </form>
+
+            
+        </div>
+
+        <div id="messageContainer">
+            <div id="messageDiv">
+
+            </div>
+
+        </div>
     </div>
+
 
     <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
     <script src="./chatmainpage.js"></script>
