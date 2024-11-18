@@ -1,28 +1,32 @@
 
 
+const socket = io('http://localhost:3000');
+
+socket.on('group message',(data)=>{
+    let message=data
+
+    let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
+    let allMessages = existingMessages.concat(message);
+
+    let recentMessages = allMessages.slice(-10);
+
+    localStorage.setItem('message', JSON.stringify(recentMessages));
+
+    getMessage()
+})
+
 document.addEventListener('DOMContentLoaded', async (event) => {
     const token = localStorage.getItem('token');
 
     localStorage.removeItem('group');
     localStorage.removeItem('message');
+    localStorage.removeItem('currentGroup')
 
     if (!token) {
         window.location.href = '/public/login.html';  // Redirect to login page if not logged in
         return;
     }
 
-    /*
-    const lastMessage = JSON.parse(localStorage.getItem('message'));
-
-    let lastMessageId = lastMessage[lastMessage.length - 1].id
-
-
-    axios.get(`http://localhost:3000/user/message?lastMessageId=${lastMessageId}`, {
-        headers: { authorization: token }
-    })
-
-        
-        .catch(err => console.log(err));*/
 
     axios.get(`http://localhost:3000/group/allGroup`, {
         headers: { authorization: token }
@@ -172,7 +176,9 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                 .then(res => {
 
 
-                    let data = res.data.newMessageData;
+                    const currentGroup=localStorage.getItem('currentGroup')
+                    let data = res.data.newMessage;
+                    socket.emit('group message',({data,currentGroup}))
 
                     let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
                     let allMessages = existingMessages.concat(data);
@@ -199,7 +205,6 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 });
 function allMessages(data) {
     const token = localStorage.getItem('token')
-    console.log(token)
     axios.get('http://localhost:3000/message/allMessage',
         {
             headers: { authorization: token },
@@ -218,7 +223,16 @@ function allMessages(data) {
 
 function getGroupMessage(data1, data2) {
 
+    let currentGroup=localStorage.getItem('currentGroup')
+    if(currentGroup){
+        localStorage.removeItem('currentGroup')
+        socket.emit('leave group',currentGroup)
+    }
+
     localStorage.setItem('group', data2)
+
+    localStorage.setItem('currentGroup',data2)
+    socket.emit('join group',(data2))
 
     const div = document.getElementById('messageContainer')
     div.innerHTML = ''
@@ -236,7 +250,6 @@ function getMessage() {
     Array.from(paragraphs).forEach(function (paragraph) {
         paragraph.remove();
     });
-    console.log(messages)
 
     messages.forEach(message => showOnScreen(message));
 }
@@ -255,10 +268,7 @@ function showOnScreen(data) {
     const p = document.createElement('p')
     p.textContent = `${data.user.name} --${data.message}`
 
-    if (data.user.name == 'you') {
-        p.style.backgroundColor = 'black'
-        p.style.color = 'white'
-    }
+    
     p.id = `${data.id}para`
     div.appendChild(p)
 }
