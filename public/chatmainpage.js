@@ -2,8 +2,8 @@
 
 const socket = io('http://localhost:3000');
 
-socket.on('group message',(data)=>{
-    let message=data
+socket.on('group message', (data) => {
+    let message = data
 
     let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
     let allMessages = existingMessages.concat(message);
@@ -57,6 +57,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     const removeUser = document.getElementById('removeUserForm')
 
     const createMessage = document.getElementById('messageForm')
+
+    const fileForm = document.getElementById('fileForm')
 
     const logout = document.getElementById('logoutButton')
 
@@ -176,9 +178,9 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                 .then(res => {
 
 
-                    const currentGroup=localStorage.getItem('currentGroup')
+                    const currentGroup = localStorage.getItem('currentGroup')
                     let data = res.data.newMessage;
-                    socket.emit('group message',({data,currentGroup}))
+                    socket.emit('group message', ({ data, currentGroup }))
 
                     let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
                     let allMessages = existingMessages.concat(data);
@@ -195,6 +197,45 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         }
     )
 
+    fileForm.addEventListener('submit',
+        function (event) {
+            event.preventDefault();
+
+            const group = localStorage.getItem('group')
+
+            if (!group) {
+                alert('Select group')
+                return
+            }
+
+            const file = document.getElementById('file').files[0]
+            const data = new FormData()
+            data.append('file', file); // Field name must be 'file'
+            data.append('groupName', group)
+
+            console.log(data)
+
+            axios.post('http://localhost:3000/message/createFile', data,
+                {
+                    headers: { authorization: token }
+                })
+                .then(res => {
+                    const currentGroup = localStorage.getItem('currentGroup')
+                    let data = res.data.newMessage;
+                    socket.emit('group message', ({ data, currentGroup }))
+
+                    let existingMessages = JSON.parse(localStorage.getItem('message')) || [];
+                    let allMessages = existingMessages.concat(data);
+
+                    let recentMessages = allMessages.slice(-10);
+
+                    localStorage.setItem('message', JSON.stringify(recentMessages));
+
+                    getMessage()
+                })
+                .catch(err => console.log(err))
+        }
+    )
 
     logout.addEventListener('click',
         () => {
@@ -218,21 +259,21 @@ function allMessages(data) {
 
             getMessage()
         })
-        .catch(error=>console.log(error))
+        .catch(error => console.log(error))
 }
 
 function getGroupMessage(data1, data2) {
 
-    let currentGroup=localStorage.getItem('currentGroup')
-    if(currentGroup){
+    let currentGroup = localStorage.getItem('currentGroup')
+    if (currentGroup) {
         localStorage.removeItem('currentGroup')
-        socket.emit('leave group',currentGroup)
+        socket.emit('leave group', currentGroup)
     }
 
     localStorage.setItem('group', data2)
 
-    localStorage.setItem('currentGroup',data2)
-    socket.emit('join group',(data2))
+    localStorage.setItem('currentGroup', data2)
+    socket.emit('join group', (data2))
 
     const div = document.getElementById('messageContainer')
     div.innerHTML = ''
@@ -262,15 +303,32 @@ function showOnScreen(data) {
         return;
     }
 
-    const div = document.getElementById('messageContainer')
+    console.log(data)
+    if (data.message) {
+
+        const div = document.getElementById('messageContainer')
+        const p = document.createElement('p')
+        p.textContent = `${data.user.name} --${data.message}`
+        p.id = `${data.id}para`
+        div.appendChild(p)
+    }
+
+    else{
+        const div = document.getElementById('messageContainer')
+        const p = document.createElement('p')
+        p.id = `${data.id}para`
+        const a=document.createElement('a')
+        a.href=data.url
+        a.textContent='click here to dwonload'
+        a.style.display='block'
+        p.textContent = `${data.user.name} ----`
+        p.appendChild(a)
+
+        div.appendChild(p)
+    }
 
 
-    const p = document.createElement('p')
-    p.textContent = `${data.user.name} --${data.message}`
 
-    
-    p.id = `${data.id}para`
-    div.appendChild(p)
 }
 
 

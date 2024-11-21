@@ -11,8 +11,12 @@ const message=sequelize.define('message',{
     },
     message:{
       type:Sequelize.TEXT,
-      allowNull:false,
+      allowNull:true,
     },
+    url:{
+      type:Sequelize.TEXT,
+      allowNull:true
+    }
   })
   
   module.exports=message;

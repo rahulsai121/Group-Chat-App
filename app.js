@@ -50,6 +50,7 @@ Groupmember.belongsTo(Group)
 
 
 const PORT = process.env.PORT || 3000;
+
 sequelize.sync()
     .then(() => {
         console.log('Database synced');
@@ -68,12 +69,12 @@ sequelize.sync()
             console.log('a user connected')
 
             socket.on('join group', (id) => {
-                console.log('join this group' + id)
+                console.log('join this group ' + id)
                 socket.join(id);
             })
 
             socket.on('leave group', (id) => {
-                console.log('leaving this group' + id)
+                console.log('leaving this group ' + id)
                 socket.leave(id)
             })
 
