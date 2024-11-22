@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors')
+const cron = require('node-cron');
+
 
 
 
@@ -9,6 +11,7 @@ const User = require('./model/user')
 const Message = require('./model/message')
 const Group = require('./model/group')
 const Groupmember = require('./model/groupMember')
+const OldMessages=require('./model/archivedMessage')
 
 
 
@@ -17,6 +20,7 @@ const groupRoutes = require('./routes/group')
 const messageRoutes = require('./routes/message')
 
 
+const archiveOldMessages = require('./functions/archiveMessages');
 
 const app = express()
 require('dotenv').config();
@@ -38,6 +42,14 @@ app.use('/message', messageRoutes)
 
 User.hasMany(Message)
 Message.belongsTo(User)
+
+
+User.hasMany(OldMessages)
+OldMessages.belongsTo(User)
+
+
+Group.hasMany(OldMessages)
+OldMessages.belongsTo(Group)
 
 Group.hasMany(Message)
 Message.belongsTo(Group)
@@ -69,22 +81,22 @@ sequelize.sync()
             console.log('a user connected')
 
             socket.on('join group', (id) => {
-                console.log('join this group ' + id)
                 socket.join(id);
             })
 
             socket.on('leave group', (id) => {
-                console.log('leaving this group ' + id)
                 socket.leave(id)
             })
 
             socket.on('group message', (obj) => {
 
-                console.log(obj.currentGroup,)
                 io.to(obj.currentGroup).emit('group message', obj.data)
-                //socket.broadcast.emit('group message',obj)
             })
         })
+        cron.schedule(' 0 0 * * *', () => {
+            console.log('Running cron job to archive old messages...');
+            archiveOldMessages();
+        });
 
 
     })
