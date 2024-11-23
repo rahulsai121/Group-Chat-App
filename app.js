@@ -1,8 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const cron = require('node-cron');
-
-
+const path=require('path')
 
 
 const sequelize = require('./utility/database');
@@ -30,15 +29,25 @@ require('dotenv').config();
 app.use(cors({
     origin: 'http://127.0.0.1:5500'
 }));
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
+app.use((req,res,next)=>{
+    if(!req.path.startsWith('/user') && 
+    !req.path.startsWith('/group') &&
+    !req.path.startsWith('/message'))
+    {
+    res.sendFile(path.join(__dirname,`public/${req.url}`))
+    }
+    else{
+        next();
+    }
+})
 
 app.use('/user', userRoutes)
 app.use('/group', groupRoutes)
 app.use('/message', messageRoutes)
-
 
 User.hasMany(Message)
 Message.belongsTo(User)
@@ -59,6 +68,7 @@ Groupmember.belongsTo(User)
 
 Group.hasMany(Groupmember)
 Groupmember.belongsTo(Group)
+
 
 
 const PORT = process.env.PORT || 3000;
