@@ -1,6 +1,6 @@
 
 
-const socket = io('http://localhost:3000');
+const socket = io('http://52.66.189.0:3000');
 
 socket.on('group message', (data) => {
     let message = data
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     }
 
 
-    axios.get(`http://localhost:3000/group/allGroup`, {
+    axios.get(`http://52.66.189.0:3000/group/allGroup`, {
         headers: { authorization: token }
     })
         .then(res => {
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             const groupName = document.getElementById('createGroup').value;
 
             try {
-                const res = await axios.post('http://localhost:3000/group/createGroup', { groupName }, {
+                const res = await axios.post('http://52.66.189.0:3000/group/createGroup', { groupName }, {
                     headers: { authorization: token }
                 });
                 console.log('res----', res.data)
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             const group = document.getElementById('groupNameToAddUser').value
 
 
-            axios.post(`http://localhost:3000/group/addUser`, { email, group }, {
+            axios.post(`http://52.66.189.0:3000/group/addUser`, { email, group }, {
                 headers: { authorization: token }
             })
                 .then(res => alert(res.data.message))
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
 
 
-            axios.put(`http://localhost:3000/group/promoteUser`, { email, group }, {
+            axios.put(`http://52.66.189.0:3000/group/promoteUser`, { email, group }, {
                 headers: { authorization: token }
             })
                 .then(res => alert(res.data.message))
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             const group = document.getElementById('removeUserInGroup').value
 
 
-            axios.delete(`http://localhost:3000/group/removeUser`, { data: { email, group }, headers: { 'authorization': token } })
+            axios.delete(`http://52.66.189.0:3000/group/removeUser`, { data: { email, group }, headers: { 'authorization': token } })
                 .then(res => alert(res.data.message))
                 .catch(err => {
                     console.log(err)
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             const message = document.getElementById('message').value
 
 
-            axios.post('http://localhost:3000/message/createMessage',
+            axios.post('http://52.66.189.0:3000/message/createMessage',
                 {
                     message: message,
                     groupName: group
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
             console.log(data)
 
-            axios.post('http://localhost:3000/message/createFile', data,
+            axios.post('http://52.66.189.0:3000/message/createFile', data,
                 {
                     headers: { authorization: token }
                 })
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 });
 function allMessages(data) {
     const token = localStorage.getItem('token')
-    axios.get('http://localhost:3000/message/allMessage',
+    axios.get('http://52.66.189.0:3000/message/allMessage',
         {
             headers: { authorization: token },
             params: { groupName: data }

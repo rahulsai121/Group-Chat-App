@@ -8,7 +8,7 @@ document.getElementById('signupForm').addEventListener('submit',
 
         console.log(name, email, password)
 
-        axios.post('http://localhost:3000/user/signup', {
+        axios.post('http://52.66.189.0:3000/user/signup', {
             name: name,
             email: email,
             password: password
